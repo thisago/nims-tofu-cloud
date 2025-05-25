@@ -3,6 +3,8 @@
 
 Nim Hello World HTTP server deployed on AWS cloud via Open Tofu.
 
+| *Learning purposes*
+
 * Usage Locally
 ** Build The Server
 #+begin_src bash
