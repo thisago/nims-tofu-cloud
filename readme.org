@@ -1,9 +1,68 @@
 #+title: Nim's Tofu Cloud
+#+startup: content
 
 Nim Hello World HTTP server deployed on AWS cloud via Open Tofu.
 
-* Steps
-1. [ ] Hello World application that requires a secret to respond.
-2. [ ] Docker Image building and pushing
+* Usage Locally
+** Build The Server
+#+begin_src bash
+nimble build_release
+#+end_src
+
+** Set =.env=
+#+begin_src bash
+SECRET=passphrase
+#+end_src
+
+** Running
+#+begin_src bash
+./build/nims_tofu_cloud
+#+end_src
+
+** Call the API
+#+begin_src bash :results pp :wrap src json
+curl 'http://localhost:5000?secret=passphrase'
+#+end_src
+
+#+RESULTS:
+#+begin_src json
+{"message":"Hello, World!"}
+#+end_src
+
+
+* Usage With Docker
+** Build Docker Image
+#+begin_src bash
+docker build .
+#+end_src
+
+** Run the Image
+#+begin_src bash
+docker run \
+  --rm \
+  -p 5000:5000 \
+  --env SECRET=hello \
+  $IMAGE_SHA256
+#+end_src
+
+** Call the API
+#+begin_src bash :results pp :wrap src json
+curl 'http://localhost:5000?secret=hello'
+#+end_src
+
+#+RESULTS:
+#+begin_src json
+{"message":"Hello, World!"}
+#+end_src
+
+
+* Run Hurl Tests
+#+begin_src bash :results pp
+nimble test
+#+end_src
+
+
+* Development Steps
+1. [X] Hello World application that requires a secret to respond.
+2. [X] Docker Image building and pushing
 3. [ ] Define the infrastructure
-4. [ ] Deploy the infrastructure
