@@ -4,5 +4,6 @@ Nim Hello World HTTP server deployed on AWS cloud via Open Tofu.
 
 * Steps
 1. [ ] Hello World application that requires a secret to respond.
-2. [ ] Docker Image building
-3. [ ]
+2. [ ] Docker Image building and pushing
+3. [ ] Define the infrastructure
+4. [ ] Deploy the infrastructure
