@@ -2,5 +2,5 @@
 /build/
 .aider*
 /infra/.terraform/
-/infra/terraform.tfstate
-/infra/terraform.tfvars
+/infra/*.tfstate*
+/infra/*.tfvars*
