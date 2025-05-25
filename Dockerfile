@@ -1,8 +1,8 @@
-# Use the official Nim image as the base
-FROM nimlang/nim:2.2.2-alpine-regular
+# Build stage
+FROM nimlang/nim:2.2.2-alpine-regular AS builder
 
-# For signal handling, install tini
-RUN apk add --no-cache tini
+# Install build dependencies and tini
+RUN apk add --no-cache git curl gcc g++ make tini
 
 # Copy sources
 COPY . /app/
@@ -11,15 +11,17 @@ WORKDIR /app
 # Build the project
 RUN nimble build_release
 
-# Clean
-# Remove unnecessary files to reduce image size
-RUN rm -rf /app/src /app/nims_tofu_cloud.nimble /tmp
-# Remove the Nim compiler and other build tools
-RUN apk del git mercurial openssl g++ curl tar xz nodejs
-RUN rm -rf /nim/ /root/.nimble
+# Runtime stage
+FROM alpine:3.18
+
+# Copy tini from the builder stage
+COPY --from=builder /sbin/tini /sbin/tini
+
+# Copy the built binary from the builder stage
+COPY --from=builder /app/build/nims_tofu_cloud /app/nims_tofu_cloud
 
 # Set the entrypoint through tini
-ENTRYPOINT ["/sbin/tini", "--", "/app/build/nims_tofu_cloud"]
+ENTRYPOINT ["/sbin/tini", "--", "/app/nims_tofu_cloud"]
 
 # Expose the port
 EXPOSE 5000
