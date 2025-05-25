@@ -1,5 +1,13 @@
-GET {{host}}/
+# Test for Unauthorized Request
+
+GET {{HOST}}/?secret=invalid_secret
+HTTP 401
+[Asserts]
+jsonpath  "$.error" == "Unauthorized"
+
+# Test for Authorized Request
+
+GET {{HOST}}/?secret={{SECRET}}
 HTTP 200
 [Asserts]
-status == 200
-body == "Hello, World!"
+jsonpath  "$.message" == "Hello, World!"
