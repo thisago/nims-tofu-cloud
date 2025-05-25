@@ -1,7 +1,7 @@
 #+title: Nim's Tofu Cloud
 #+startup: content
 
-Nim Hello World HTTP server deployed on AWS cloud via Open Tofu.
+Nim Hello World HTTP server deployed on AWS ECS via Open Tofu.
 
 | *Learning purposes*
 
