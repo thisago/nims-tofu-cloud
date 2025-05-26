@@ -57,6 +57,12 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+// Create CloudWatch log group for ECS
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = "/ecs/nims-tofu"
+  retention_in_days = 1
+}
+
 // Main ECS resources for NIMS Tofu Cloud
 resource "aws_ecs_cluster" "default" {
   name = "nims-tofu-cluster"
@@ -89,7 +95,7 @@ resource "aws_ecs_task_definition" "tofu" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/nims-tofu"
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_log_group.name
           "awslogs-region"        = var.region
           "awslogs-stream-prefix" = "tofu"
         }
