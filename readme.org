@@ -5,6 +5,28 @@ Nim Hello World HTTP server deployed on AWS ECS via Open Tofu.
 
 | *Learning purposes*
 
+* Infra
+#+begin_src mermaid
+architecture-beta
+    group vpc(cloud)[VPC]
+
+    group cluster(server)[ECS Cluster] in vpc
+        service ecs_service(server)[ECS Service] in cluster
+        service task_definition(server)[ECS Task Definition] in cluster
+        service container(server)[Container] in cluster
+
+    service logs(cloud)[CloudWatch Log Group] in vpc
+    service sg(cloud)[Security Group] in vpc
+    service role(cloud)[IAM Role for ECS Task Execution] in vpc
+    service subnets(cloud)[Public Subnets] in vpc
+
+    container:R -- L:logs
+    container:T -- B:sg
+    ecs_service:B -- T:subnets
+    task_definition:T -- B:role
+    ecs_service:T -- B:task_definition
+#+end_src
+
 * Usage Locally
 ** Build The Server
 #+begin_src bash
@@ -67,4 +89,4 @@ nimble test
 * Development Steps
 1. [X] Hello World application that requires a secret to respond.
 2. [X] Docker Image building and pushing
-3. [ ] Define the infrastructure
+3. [X] Define the infrastructure
