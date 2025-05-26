@@ -44,7 +44,7 @@ SECRET=passphrase
 #+end_src
 
 ** Call the API
-#+begin_src bash :results pp :wrap src json
+#+begin_src bash :results pp :wrap src json :exports both
 curl 'http://localhost:5000?secret=passphrase'
 #+end_src
 
@@ -70,7 +70,7 @@ docker run \
 #+end_src
 
 ** Call the API
-#+begin_src bash :results pp :wrap src json
+#+begin_src bash :results pp :wrap src json :exports both
 curl 'http://localhost:5000?secret=hello'
 #+end_src
 
