@@ -8,22 +8,28 @@ Nim Hello World HTTP server deployed on AWS ECS via Open Tofu.
 * Infra
 #+begin_src mermaid
 architecture-beta
-    group vpc(cloud)[VPC]
-
+  group vpc(cloud)[VPC]
     group cluster(server)[ECS Cluster] in vpc
-        service ecs_service(server)[ECS Service] in cluster
+      service ecs_service(server)[ECS Service] in cluster
+
     group task_group(server)[ECS Task Definition] in vpc
-        service container(server)[Container] in task_group
+      service container(server)[Container] in task_group
 
-    service logs(cloud)[CloudWatch Log Group] in vpc
+    group subnets(cloud)[Public Subnets] in vpc
+      service ecs_task(server)[ECS Task] in subnets
+
     service sg(cloud)[Security Group] in vpc
-    service role(cloud)[IAM Role for ECS Task Execution] in vpc
-    service subnets(cloud)[Public Subnets] in vpc
 
-    container:R -- L:logs
-    container:T -- B:sg
-    ecs_service:B -- T:subnets
-    ecs_service:R -- L:container
+  service role(cloud)[IAM Role for ECS Task Execution]
+  service logs(cloud)[CloudWatch Log Group]
+  service internet(cloud)[Internet]
+
+  container:R -- L:logs
+  ecs_service:T -- B:sg
+  ecs_service:R -- L:ecs_task
+  ecs_task:T -- B:container
+  role:L -- R:ecs_task
+  internet:T -- B:ecs_task
 #+end_src
 
 * Usage Locally

@@ -4,6 +4,7 @@ provider "aws" {
 }
 
 // Use existing VPC and subnets
+// This configuration assumes that you have a default VPC and public subnets available in your AWS account.
 data "aws_vpc" "default" {}
 data "aws_subnets" "public" {
   filter {
@@ -16,7 +17,8 @@ data "aws_subnets" "public" {
   }
 }
 
-
+// Security Group
+// The security group allows inbound traffic on port 5000 for the ECS service and allows all outbound traffic.
 resource "aws_security_group" "svc" {
   name   = "nims-tofu"
   vpc_id = data.aws_vpc.default.id
@@ -35,6 +37,7 @@ resource "aws_security_group" "svc" {
 }
 
 // IAM role for ECS task execution
+// This role allows ECS tasks to pull images from ECR and write logs to CloudWatch.
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "nims-tofu-ecs-task-execution-role"
   assume_role_policy = jsonencode({
@@ -52,22 +55,26 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 }
 
 // IAM role policy attachment for ECS task execution
+// This attaches the AmazonECSTaskExecutionRolePolicy to the ECS task execution role, allowing it to perform necessary actions.
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-// Create CloudWatch log group for ECS
+// CloudWatch log group for ECS tasks
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "/ecs/nims-tofu"
   retention_in_days = 1
 }
 
-// Main ECS resources for NIMS Tofu Cloud
+// ECS Cluster
+// It is a logical grouping of tasks and services.
 resource "aws_ecs_cluster" "default" {
   name = "nims-tofu-cluster"
 }
 
+// ECS Task Definition
+// It defines the container settings, including the Docker image, CPU, memory, and environment variables.
 resource "aws_ecs_task_definition" "tofu" {
   family                   = "nims-tofu"
   requires_compatibilities = ["FARGATE"]
@@ -104,7 +111,8 @@ resource "aws_ecs_task_definition" "tofu" {
   ])
 }
 
-// IAM role for ECS task execution
+// ECS Service
+// It uses the task definition and runs the container in the ECS cluster through Fargate.
 resource "aws_ecs_service" "tofu" {
   name            = "nims-tofu"
   cluster         = aws_ecs_cluster.default.id
@@ -121,3 +129,11 @@ resource "aws_ecs_service" "tofu" {
   deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 200
 }
+
+// An overview of the resources created by this Terraform configuration:
+// - Inside the default VPC, it creates a security group that allows inbound traffic on port 5000.
+// - It creates an IAM role for ECS task execution with the necessary permissions to pull images and write logs.
+// - It sets up a CloudWatch log group for the ECS tasks.
+// - It creates an ECS cluster named "nims-tofu-cluster".
+// - It defines an ECS task definition for the "nims-tofu" service, specifying the Docker image, CPU, memory, and environment variables.
+// - Finally, it creates an ECS service that runs the task definition in the cluster, using Fargate for serverless container management.
